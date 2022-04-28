@@ -1,0 +1,98 @@
+#include <Arduino.h>
+#include <Wire.h>
+#include <SPI.h>
+#include <GyverOLED.h>
+#define BTSerial Serial1
+GyverOLED<SSH1106_128x64> oled;
+int mode = 2;
+
+String x = "";
+String y = "";
+
+void setup() {
+  SPI.begin();
+  oled.init();
+
+  Serial.begin(9600);
+  Serial.print("Enter AT commands: ");
+  BTSerial.begin(38400);
+  BTSerial.write("connected to you\r\n");
+  delay(50);
+}
+
+void reculer(){
+  oled.clear();
+  oled.setCursorXY(0, 0);
+  oled.print("reculer");
+  oled.update();
+}
+
+void avancer(){
+  oled.clear();
+  oled.setCursorXY(0, 0);
+  oled.print("avancer");
+  oled.update();
+}
+
+void gauche(){
+  oled.clear();
+  oled.setCursorXY(0, 0);
+  oled.print("turn left");
+  oled.update();
+}
+
+void droite(){
+  oled.clear();
+  oled.setCursorXY(0, 0);
+  oled.print("turn right");
+  oled.update();
+}
+
+void loop() {
+  String recu;
+  while(BTSerial.available()){
+    recu = BTSerial.readString();
+    Serial.println(recu);
+
+    if (recu == "Mode manuel !"){
+      mode = 0;
+      BTSerial.write("ok");
+    }
+
+    else if (recu == "Mode auto !"){
+      mode = 1;
+      BTSerial.write("Mode auto actif \r\n");
+    }
+
+    while (mode == 0){
+      recu = BTSerial.readString();
+      if (recu == "Mode auto !"){
+        mode = 1;
+      }
+      if (recu == "avancer"){
+        avancer();
+      }
+      if (recu == "reculer"){
+        reculer();
+      }
+      if (recu == "droite"){
+        droite();
+      }
+      if (recu == "gauche"){
+        gauche();
+      }
+      
+    }
+  }
+
+  while(Serial.available()){
+    recu = Serial.readString();
+    BTSerial.write(Serial.read());
+  }
+
+  if (BTSerial.available())
+    Serial.write(BTSerial.read());
+
+  if (Serial.available())
+    BTSerial.write(Serial.read());
+}
