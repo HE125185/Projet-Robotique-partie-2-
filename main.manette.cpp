@@ -1,3 +1,5 @@
+#Année 2021-2022
+#Groupe 2
 #include <LiquidCrystal.h> // includes the LiquidCrystal Library
 #include <SPI.h>
 #include <Wire.h>
